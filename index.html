@@ -96,8 +96,9 @@ function generate(){
  function eligible(p,section){
   let level=+(p.skills[section.id]||0);
   if(level<1)return false;
-  if(section.id==='door')return p.doorEligible===true&&p.id!=='s10'&&level===3;
-  if(section.id==='prayer'||section.id==='hymn')return level===3;
+  if(section.id==='door')return true;
+  if(section.id==='hymn')return p.id==='s22'||p.id==='s02';
+  if(section.id==='prayer')return level===3;
   return true;
  }
  function score(p,section){
@@ -105,6 +106,7 @@ function generate(){
   let gap=x.last?weeks(x.last,date):999;
   return (gap>=2?10000:0)+Math.min(gap,100)*100-(x.count||0)*20+(+(p.skills[section.id]||0))*5;
  }
+ chosen.sort((a,b)=>(a.id==='hymn'?-1:b.id==='hymn'?1:0));
  for(const section of chosen){
   let pool=people.filter(p=>eligible(p,section)&&!used.has(p.id)&&!prevIds.has(p.id));
   let selected=[];
