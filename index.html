@@ -95,7 +95,7 @@ function generate(){
  let prevIds=new Set((prev?.assignments||[]).flatMap(a=>a.ids||[])),used=new Set(),assignments=[],issues=[];
  function eligible(p,section){
   let level=+(p.skills[section.id]||0);
-  if(section.id==='door')return true;
+  if(section.id==='door')return !['s01','s03','s05','s14','s17','s18','s21'].includes(p.id);
   if(section.id==='hymn')return p.id==='s22'||p.id==='s02';
   if(p.id==='s01'&&section.id!=='prayer')return false;
   if(p.id==='s02'&&section.id!=='prayer')return false;
