@@ -143,7 +143,7 @@ function generate(){
  const assignedNow=new Set(assignments.flatMap(a=>a.ids||[]));
  const alternatives={};
  for(const a of assignments){
-  alternatives[a.sectionId]=people.filter(p=>eligible(p,{id:a.sectionId})&&!assignedNow.has(p.id)&&!prevIds.has(p.id))
+  alternatives[a.sectionId]=people.filter(p=>eligible(p,{id:a.sectionId})&&!assignedNow.has(p.id)&&!prevIds.has(p.id)&&(a.required!==2||a.ids.some(id=>+(people.find(q=>q.id===id)?.skills[a.sectionId]||0)===3)||+(p.skills[a.sectionId]||0)===3))
    .sort((x,y)=>score(y,{id:a.sectionId})-score(x,{id:a.sectionId})).slice(0,3)
    .map(p=>({id:p.id,name:p.name}));
  }
@@ -177,7 +177,10 @@ function renderCalendar(){
  document.getElementById('calendarView').innerHTML='<h3>الجمع القادمة</h3>'+future.map(d=>'<div class="assigned"><h3>'+fmt(d)+' — لم يتم التوزيع بعد</h3><div class="actions"><button class="btn" onclick="tab(\'planner\');document.getElementById(\'pDate\').value=\''+d+'\'">جهّز الافتتاحية</button></div></div>').join('')+'<h3>الجمع السابقة</h3>'+(past.length?past.map(h=>'<div class="assigned"><h3>'+fmt(h.date)+' — معتمدة</h3><div class="names">'+h.assignments.map(a=>'<span class="namepill">'+esc(a.sectionName)+': '+esc((a.names||[]).join(' + '))+'</span>').join('')+'</div></div>').join(''):'<div class="empty">لا توجد جمع محفوظة.</div>');
 }
 function openWhatsApp(servantId,sectionName,date){
- let s=db.servants.find(x=>x.id===servantId);let message=servantId?'سلام يا '+(s?.name||'')+' ❤️\\nمعادنا الجمعة '+fmt(date)+'، وإنت مسؤول عن فقرة: '+sectionName+'.\\nربنا يبارك خدمتك، مستنيينك 🙏':'✝️ افتتاحية الجمعة ('+fmt(date)+')\\n'+(plan?.assignments||[]).map(a=>a.sectionName+': '+a.names.join(' + ')).join('\\n')+'\\nربنا يبارك تعبكم جميعًا ❤️';
+ const s=db.servants.find(x=>x.id===servantId);
+ const message=servantId
+  ?'سلام يا '+(s?.name||'')+' ❤️\nمعادنا الجمعة '+fmt(date)+'، وإنت مسؤول عن فقرة: '+sectionName+'.\nياريت تجهز الفقرة وتكون موجود بدري.\nربنا يبارك خدمتك، مستنيينك 🙏'
+  :'✝️ افتتاحية الجمعة ('+fmt(date)+')\n'+(plan?.assignments||[]).map(a=>a.sectionName+': '+a.names.join(' + ')).join('\n')+'\nربنا يبارك تعبكم جميعًا ❤️';
  window.open('https://wa.me/?text='+encodeURIComponent(message),'_blank');
 }
 function renderBackupStatus(){const last=Number(localStorage.getItem('efteta7eya_last_backup')||0),days=last?Math.floor((Date.now()-last)/86400000):null,due=days===null||days>=14,msg=days===null?'لم يتم تسجيل نسخة احتياطية على هذا المتصفح بعد.':'آخر نسخة احتياطية منذ '+days+' يومًا.',html='<div class="'+(due?'warn':'ok')+'">'+(due?'تذكير: ':'')+msg+'</div>';document.getElementById('backupReminder').innerHTML=html;document.getElementById('backupStatus').textContent=msg;}
