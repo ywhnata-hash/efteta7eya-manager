@@ -13,7 +13,7 @@
 <div class="footer">نسخة أولية مجانية — البيانات محلية على هذا الجهاز والمتصفح.</div></main>
 <script>
 const KEY='efteta7eya_v3';
-const initialServants=[{"id":"s01","name":"أ. مينا متري","skills":{},"active":true},{"id":"s02","name":"أ. مينا يوسف","skills":{},"active":true},{"id":"s03","name":"أ. مينا مجدي","skills":{},"active":true},{"id":"s04","name":"أ. توني عادل","skills":{},"active":true},{"id":"s05","name":"أ. انطون ابو الخير","skills":{},"active":true},{"id":"s06","name":"أ. اندرو اسحاق","skills":{},"active":true},{"id":"s07","name":"أ. ابانوب صفوت","skills":{},"active":true},{"id":"s08","name":"أ. بولا صفوت","skills":{},"active":true},{"id":"s09","name":"أ. بيشوي شاهر","skills":{},"active":true},{"id":"s10","name":"أ. ثروت شريف","skills":{},"active":true},{"id":"s11","name":"أ. چون مدحت","skills":{},"active":true},{"id":"s12","name":"أ. چورچ بشري","skills":{},"active":true},{"id":"s13","name":"أ. حكيم رمسيس","skills":{},"active":true},{"id":"s14","name":"أ. عاطف عماد","skills":{},"active":true},{"id":"s15","name":"أ. فيلوباتير سامح","skills":{},"active":true},{"id":"s16","name":"أ. فادي أيمن","skills":{},"active":true},{"id":"s17","name":"أ. كيرلس صلاح","skills":{},"active":true},{"id":"s18","name":"أ. كيرلس نبيل","skills":{},"active":true},{"id":"s19","name":"أ. كيرلس سعد","skills":{},"active":true},{"id":"s20","name":"أ. مارتن وائل","skills":{},"active":true},{"id":"s21","name":"أ. ميخائيل عزمي","skills":{},"active":true},{"id":"s22","name":"أ. يوحنا","skills":{},"active":true}];
+const initialServants=[{"id":"s01","name":"أ. مينا متري","skills":{},"active":true},{"id":"s02","name":"أ. مينا يوسف","skills":{},"active":true},{"id":"s03","name":"أ. مينا مجدي","skills":{},"active":true},{"id":"s04","name":"أ. توني عادل","skills":{},"active":true},{"id":"s05","name":"أ. انطون ابو الخير","skills":{},"active":true},{"id":"s06","name":"أ. اندرو اسحاق","skills":{},"active":true},{"id":"s07","name":"أ. ابانوب صفوت","skills":{},"active":true},{"id":"s08","name":"أ. بولا صفوت","skills":{},"active":true},{"id":"s09","name":"أ. بيشوي شاهر","skills":{},"active":true},{"id":"s10","name":"أ. ثروت شريف","skills":{},"active":true},{"id":"s11","name":"أ. چون مدحت","skills":{},"active":true},{"id":"s12","name":"أ. چورچ بشري","skills":{},"active":true},{"id":"s13","name":"أ. حكيم رمسيس","skills":{},"active":true},{"id":"s14","name":"أ. عاطف عماد","skills":{},"active":true},{"id":"s15","name":"أ. فيلوباتير سامح","skills":{},"active":true},{"id":"s16","name":"أ. فادي أيمن","skills":{},"active":true},{"id":"s17","name":"أ. كيرلس صلاح","skills":{},"active":true},{"id":"s18","name":"أ. كيرلس نبيل","skills":{},"active":true},{"id":"s19","name":"أ. كيرلس سعد","skills":{},"active":true},{"id":"s20","name":"أ. مارتن وائل","skills":{},"active":true},{"id":"s21","name":"أ. ميخائيل عزمي","skills":{},"active":true},{"id":"s22","name":"أ. يوحنا عطا","skills":{},"active":true}];
 const defaults=[['الصلاة',1,'prayer'],['لحن / ترنيمة',1,'hymn'],['الكتاب المقدس',2,'bible'],['الطقس والسلوك',2,'ritual'],['شخصيات كتابية',2,'characters'],['الألعاب',2,'games'],['مسؤول الباب',1,'door']];
 let db=load(),editS=null,editSec=null,plan=null;
 function uid(){return 'x'+Math.random().toString(36).slice(2)+Date.now().toString(36)}
@@ -80,9 +80,65 @@ document.getElementById('clearWeek').onclick=()=>{document.querySelectorAll('[da
 function stats(){let o={};db.servants.forEach(s=>o[s.id]={count:0,last:null});db.history.forEach(h=>h.assignments.forEach(a=>(a.ids||[]).forEach(id=>{if(o[id]&&!((a.sectionName||'').includes('إعلان نتيجة المسابقة'))){o[id].count++;o[id].last=h.date}})));return o}
 function weeks(a,b){return Math.floor((new Date(b+'T12:00:00')-new Date(a+'T12:00:00'))/604800000)}
 function fmt(d){return new Date(d+'T12:00:00').toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'})}
-function generate(){let date=document.getElementById('pDate').value;if(!date)return alert('اختر تاريخ الجمعة.');if(new Date(date+'T12:00:00').getDay()!==5)return alert('التاريخ يجب أن يكون يوم جمعة.');if(db.history.some(h=>h.date===date))return alert('هناك توزيع محفوظ لهذا التاريخ بالفعل.');let chosen=db.sections.filter(s=>s.active&&document.querySelector(`[data-w="${s.id}"]`)?.checked).map(s=>({id:s.id,name:s.name,count:+document.querySelector(`[data-count="${s.id}"]`).value}));if(!chosen.length)return alert('اختر فقرة واحدة على الأقل.');let people=db.servants.filter(s=>s.active),st=stats();if(!people.length)return alert('أضف الخدام أولًا.');let prev=db.history.filter(h=>h.date<date).sort((a,b)=>b.date.localeCompare(a.date))[0],prevIds=new Set((prev?.assignments||[]).flatMap(a=>a.ids||[])),used=new Set(),assignments=[],issues=[];let slots=[];chosen.forEach(s=>{for(let i=0;i<s.count;i++)slots.push({sectionId:s.id,sectionName:s.name})});slots.sort((a,b)=>people.filter(p=>p.skills[a.sectionId]>0&&!prevIds.has(p.id)&&p.id!=='s01'&&(p.id!=='s02'||a.sectionId==='hymn')&&(a.sectionId!=='door'||p.doorEligible)).length-people.filter(p=>p.skills[b.sectionId]>0&&!prevIds.has(p.id)&&p.id!=='s01'&&(p.id!=='s02'||b.sectionId==='hymn')&&(b.sectionId!=='door'||p.doorEligible)).length);
-for(let slot of slots){let pool=people.filter(p=>+p.skills[slot.sectionId]>0&&!prevIds.has(p.id)&&!used.has(p.id)&&p.id!=='s01'&&(p.id!=='s02'||slot.sectionId==='hymn')&&(slot.sectionId!=='door'||p.doorEligible));if(!pool.length){pool=people.filter(p=>+p.skills[slot.sectionId]>0&&!used.has(p.id)&&p.id!=='s01'&&(p.id!=='s02'||slot.sectionId==='hymn')&&(slot.sectionId!=='door'||p.doorEligible));if(pool.length)issues.push('تعذر تجنب تكرار الأسبوع السابق في فقرة '+slot.sectionName+'.')}pool.sort((a,b)=>{let aa=st[a.id],bb=st[b.id],ga=aa?.last?weeks(aa.last,date):999,gb=bb?.last?weeks(bb.last,date):999;let va=(gb>=2?10000:0)+Math.min(gb,100)*100-(bb?.count||0)*15+(+b.skills[slot.sectionId])*10;let vb=(ga>=2?10000:0)+Math.min(ga,100)*100-(aa?.count||0)*15+(+a.skills[slot.sectionId])*10;return va-vb});let p=pool[0],a=assignments.find(x=>x.sectionId===slot.sectionId);if(!a){a={sectionId:slot.sectionId,sectionName:slot.sectionName,names:[],ids:[],required:chosen.find(x=>x.id===slot.sectionId).count};assignments.push(a)}if(p){used.add(p.id);a.names.push(p.name);a.ids.push(p.id)}else issues.push('لا يوجد خادم مؤهل متاح لفقرة '+slot.sectionName+'.')}
-for(const a of assignments){if(a.required===2&&a.ids.length===2){const lv=a.ids.map(id=>+(people.find(p=>p.id===id)?.skills[a.sectionId]||0));if(!lv.some(v=>v===3))issues.push('فقرة '+a.sectionName+' لا تضم خادمًا ممتازًا؛ راجع شرط المساعدة قبل الاعتماد.');if(lv.filter(v=>v<3).length>1)issues.push('فقرة '+a.sectionName+' تضم أكثر من خادم يحتاج مساعدة؛ التوزيع غير مطابق للقاعدة.');}}let assigned=new Set(assignments.flatMap(a=>a.ids)),unserved=people.filter(p=>!assigned.has(p.id)&&(!st[p.id]?.last||weeks(st[p.id].last,date)>=2));if(unserved.length)issues.push('خدام لهم أولوية ولم يحصلوا على خانة مناسبة: '+unserved.map(x=>x.name).join('، ')+'.');plan={date,note:document.getElementById('pNote').value.trim(),assignments,issues};renderPlan()}
+function generate(){
+ let date=document.getElementById('pDate').value;
+ if(!date)return alert('اختر تاريخ الجمعة.');
+ if(new Date(date+'T12:00:00').getDay()!==5)return alert('التاريخ يجب أن يكون يوم جمعة.');
+ if(db.history.some(h=>h.date===date))return alert('هناك توزيع محفوظ لهذا التاريخ بالفعل.');
+ let chosen=db.sections.filter(s=>s.active&&document.querySelector(`[data-w="${s.id}"]`)?.checked).map(s=>({id:s.id,name:s.name,count:+document.querySelector(`[data-count="${s.id}"]`).value}));
+ if(!chosen.length)return alert('اختر فقرة واحدة على الأقل.');
+ let people=db.servants.filter(s=>s.active),st=stats();
+ if(!people.length)return alert('أضف الخدام أولًا.');
+ let prev=db.history.filter(h=>h.date<date).sort((a,b)=>b.date.localeCompare(a.date))[0];
+ let prevIds=new Set((prev?.assignments||[]).flatMap(a=>a.ids||[])),used=new Set(),assignments=[],issues=[];
+ function eligible(p,section){
+  let level=+(p.skills[section.id]||0);
+  if(level<1)return false;
+  if(section.id==='door')return p.doorEligible===true&&p.id!=='s10'&&level===3;
+  if(section.id==='prayer'||section.id==='hymn')return level===3;
+  return true;
+ }
+ function score(p,section){
+  let x=st[p.id]||{count:0,last:null};
+  let gap=x.last?weeks(x.last,date):999;
+  return (gap>=2?10000:0)+Math.min(gap,100)*100-(x.count||0)*20+(+(p.skills[section.id]||0))*5;
+ }
+ for(const section of chosen){
+  let pool=people.filter(p=>eligible(p,section)&&!used.has(p.id)&&!prevIds.has(p.id));
+  let selected=[];
+  if(section.count===1){
+   selected=pool.sort((a,b)=>score(b,section)-score(a,section)).slice(0,1);
+  }else{
+   let pairs=[];
+   for(let i=0;i<pool.length;i++)for(let j=i+1;j<pool.length;j++){
+    let a=pool[i],b=pool[j],la=+(a.skills[section.id]||0),lb=+(b.skills[section.id]||0);
+    if(Math.max(la,lb)<3)continue;
+    pairs.push({people:[a,b],score:score(a,section)+score(b,section)});
+   }
+   pairs.sort((a,b)=>b.score-a.score);
+   if(pairs.length)selected=pairs[0].people;
+   if(section.count>2&&selected.length){
+    let rest=pool.filter(p=>!selected.includes(p)).sort((a,b)=>score(b,section)-score(a,section));
+    selected=selected.concat(rest.slice(0,section.count-2));
+   }
+  }
+  if(selected.length!==section.count){
+   issues.push('لم يتم إسناد فقرة '+section.name+' لأن النظام لم يجد عددًا كافيًا من الخدام المؤهلين دون مخالفة قواعد الكفاءة أو منع التكرار.');
+   continue;
+  }
+  selected.forEach(p=>used.add(p.id));
+  assignments.push({sectionId:section.id,sectionName:section.name,ids:selected.map(p=>p.id),names:selected.map(p=>p.name),required:section.count});
+ }
+ if(!assignments.length){plan={date,note:document.getElementById('pNote').value.trim(),assignments,issues};renderPlan();return;}
+ for(const a of assignments){
+  if(a.required===2){
+   const levels=a.ids.map(id=>+(people.find(p=>p.id===id)?.skills[a.sectionId]||0));
+   if(!levels.some(v=>v===3)||levels.filter(v=>v<3).length>1)issues.push('خلل في شرط المساعدة بفقرة '+a.sectionName+'.');
+  }
+ }
+ plan={date,note:document.getElementById('pNote').value.trim(),assignments,issues};
+ renderPlan();
+}
 function renderPlan(){let p=plan,title='افتتاحية الجمعة ('+fmt(p.date)+')';let lines=[title,''];p.assignments.forEach(a=>{lines.push(a.sectionName);lines.push(a.names.length?a.names.join(' + '):'لم يتم التوزيع');lines.push('')});if(p.note)lines.push('ملاحظة: '+p.note);let copyText=lines.join('\n').trim();document.getElementById('output').innerHTML=`<hr><h2>${esc(title)}</h2>${p.issues.length?'<div class="warn"><b>تنبيهات تحتاج مراجعة:</b><ul>'+p.issues.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div>':'<div class="ok">لم تظهر تعارضات واضحة في الفحص الأولي؛ راجع التوزيع قبل اعتماده.</div>'}${p.assignments.map(a=>`<div class="assigned"><h3>${esc(a.sectionName)} — ${a.names.length}/${a.required}</h3><div class="names">${a.names.map(n=>'<span class="namepill">'+esc(n)+'</span>').join('')||'لا يوجد خادم مقترح'}</div></div>`).join('')}<div class="actions"><button class="btn" id="copyPlan">نسخ الافتتاحية</button><button class="btn green" id="approve">اعتماد وحفظ</button><button class="btn gray" id="again">إعادة التوليد</button><button class="btn gray" onclick="print()">طباعة</button></div><p class="muted">التوزيع المقترح يحتاج مراجعتك. إذا تعذر تحقيق قاعدة ما فستظهر في التنبيهات، ولا تعتبر النتيجة معتمدة إلا بعد مراجعتها.</p>`;document.getElementById('copyPlan').onclick=async()=>{try{await navigator.clipboard.writeText(copyText);alert('تم نسخ الافتتاحية.')}catch(e){let t=document.createElement('textarea');t.value=copyText;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();alert('تم نسخ الافتتاحية.')}};document.getElementById('approve').onclick=approve;document.getElementById('again').onclick=generate}
 function approve(){if(!plan)return;if(!confirm('هل راجعت التوزيع وتريد حفظه في السجل؟'))return;db.history.push({id:uid(),date:plan.date,note:plan.note,assignments:plan.assignments,created:new Date().toISOString()});db.history.sort((a,b)=>a.date.localeCompare(b.date));plan=null;document.getElementById('output').innerHTML='<div class="ok">تم حفظ التوزيع.</div>';save();tab('history')}
 function delHistory(id){if(confirm('حذف هذا السجل سيؤثر على التوزيعات القادمة. هل أنت متأكد؟')){db.history=db.history.filter(x=>x.id!==id);save()}}
