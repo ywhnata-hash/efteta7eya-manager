@@ -95,7 +95,7 @@ function generate(){
  let prevIds=new Set((prev?.assignments||[]).flatMap(a=>a.ids||[])),used=new Set(),assignments=[],issues=[];
  function eligible(p,section){
   let level=+(p.skills[section.id]||0);
-  if(section.id==='door')return !['s01','s03','s05','s14','s17','s18','s21'].includes(p.id)&&!['أ. مينا متري','أ. مينا مجدي','أ. انطون ابو الخير','أ. أنطون أبو الخير','أ. عاطف عماد','أ. كيرلس صلاح','أ. كيرلس نبيل','أ. ميخائيل عزمي'].includes(p.name);
+  if(section.id==='door'){const n=String(p.name||'').replace(/[أإآ]/g,'ا').replace(/\s+/g,' ').trim();return !['s01','s03','s05','s14','s17','s18','s21'].includes(p.id)&&!['مينا متري','مينا مجدي','انطون ابو الخير','عاطف عماد','كيرلس صلاح','كيرلس نبيل','ميخائيل عزمي'].some(x=>n.includes(x));}
   if(section.id==='hymn')return p.id==='s22'||p.id==='s02';
   if(p.id==='s01'&&section.id!=='prayer')return false;
   if(p.id==='s02'&&section.id!=='prayer')return false;
